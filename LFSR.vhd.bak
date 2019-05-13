@@ -1,0 +1,40 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity LFSR is
+Port ( clock : in STD_LOGIC;
+       reset : in STD_LOGIC;
+
+       Q : out STD_LOGIC_VECTOR (7 downto 0);
+       check: out STD_LOGIC);
+
+--       constant seed: STD_LOGIC_VECTOR(7 downto 0) := "00000001";
+end LFSR;
+
+architecture Behavior of LFSR is
+
+--signal temp: STD_LOGIC;
+signal Qt: STD_LOGIC_VECTOR(7 downto 0) := x"01";
+
+begin
+
+PROCESS(clock)
+variable tmp : STD_LOGIC := '0';
+BEGIN
+
+IF rising_edge(clock) THEN
+   IF (reset='1') THEN
+     Qt <= x"01"; 
+   --ELSE Qt <= seed;
+   ELSE
+      tmp := Qt(4) XOR Qt(3) XOR Qt(2) XOR Qt(0);
+      Qt <= tmp & Qt(7 downto 1);
+   END IF;
+
+END IF;
+END PROCESS;
+-- check <= temp;
+check <= Qt(7);
+Q <= Qt;
+
+End Behaviour;

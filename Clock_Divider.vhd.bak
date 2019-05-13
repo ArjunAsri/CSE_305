@@ -1,0 +1,32 @@
+library IEEE;
+use  IEEE.STD_LOGIC_1164.all;
+use  IEEE.STD_LOGIC_ARITH.all;
+use  IEEE.STD_LOGIC_UNSIGNED.all;
+
+ENTITY Clock_Divider IS
+	PORT(	clock_50Mhz	: IN	STD_LOGIC;
+			clock_out_25hz	: OUT	STD_LOGIC
+		);
+END Clock_Divider;
+
+architecture Behavior of Clock_Divider is
+    signal temporal: STD_LOGIC;
+    signal counter : integer range 0 to 1 := 0;
+begin
+   
+process (clock_50Mhz)
+
+begin
+       if rising_edge(clock_50Mhz) then
+            if (counter = 1) then
+                temporal <= NOT(temporal);
+                counter <= 0;
+            else
+                counter <= counter + 1;
+            end if;
+        end if;
+    end process;
+    
+    clock_out_25hz <= temporal;
+end Behavior;
+

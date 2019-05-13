@@ -1,0 +1,79 @@
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.all;
+USE  IEEE.STD_LOGIC_ARITH.all;
+USE  IEEE.STD_LOGIC_SIGNED.all;
+
+ENTITY BULLET_COLLISION IS 
+PORT ( SIGNAL MOUSE_COLUMN,MOUSE_ROW, TANK_COLUMN, TANK_ROW, TANK2_COLUMN, TANK2_ROW, TANK3_COLUMN, TANK3_ROW : IN STD_LOGIC_VECTOR (10 DOWNTO 0);
+		SIGNAL COLLISION_DETECTED : OUT STD_LOGIC;
+		SIGNAL NUMBER_OF_COLLISION : OUT STD_LOGIC_VECTOR (7 DOWNTO 0);
+		SIGNAL CLK, ENABLE_COLLISION, RESET,RESET2,RESET3,vert_sync : IN STD_LOGIC;
+		 SIGNAL ENABLE_OUT : OUT STD_LOGIC;
+		TANK_REACHED : OUT STD_LOGIC);
+END BULLET_COLLISION;
+
+
+ARCHITECTURE BEHAVIOUR OF BULLET_COLLISION IS
+
+-- SIGNAL t_BULLET_X_POSITION : STD_LOGIC_VECTOR (10 DOWNTO 0) := '0' & MOUSE_COLUMN;
+SIGNAL ENABLE_Tank : STD_LOGIC := '1'; -- SIGNAL IS ENABLED
+SIGNAL SCORE_INCREMENT : STD_LOGIC := '0';
+BEGIN
+ 
+PROCESS(clk,RESET) -- clock is needed to check the sensitivity list all the time. A variable count can be used to make the 
+variable counter : integer := 0;
+variable count_score: integer := 0;
+																				-- block reappear
+BEGIN
+IF (RESET = '1') or (RESET2 = '1') or (RESET3 = '1') THEN
+	counter:= 1;
+	Score_INCREMENT <= '0';
+	Enable_tank <= '1';
+else
+IF((rising_edge(vert_sync)and(MOUSE_COLUMN < (TANK_COLUMN + conv_std_logic_vector(10,11))) and (MOUSE_COLUMN > (TANK_COLUMN - conv_std_logic_vector(10,11)))and
+	((MOUSE_ROW < (TANK_ROW + conv_std_logic_vector(14,11))) and (MOUSE_ROW > (TANK_ROW - conv_std_logic_vector(14,11)))))
+or
+  	(rising_edge(vert_sync)and(MOUSE_COLUMN < (TANK2_COLUMN + conv_std_logic_vector(10,11))) and (MOUSE_COLUMN > (TANK2_COLUMN - conv_std_logic_vector(10,11)))and
+	((MOUSE_ROW < (TANK2_ROW + conv_std_logic_vector(14,11))) and (MOUSE_ROW > (TANK2_ROW - conv_std_logic_vector(14,11)))))
+or
+   (rising_edge(vert_sync)and(MOUSE_COLUMN < (TANK3_COLUMN + conv_std_logic_vector(10,11))) and (MOUSE_COLUMN > (TANK3_COLUMN - conv_std_logic_vector(10,11)))and
+	((MOUSE_ROW < (TANK3_ROW + conv_std_logic_vector(14,11))) and (MOUSE_ROW > (TANK3_ROW - conv_std_logic_vector(14,11))))))
+		--AND ENABLE_COLLISION = '1')
+ THEN
+	counter := counter + 1;
+	if (counter >1) then 
+		EnaBLE_Tank <= '0' ;
+
+		--count_score := 1;
+		scoRE_INCREMENT <= '1';
+				---- ADDED
+		IF ((TANK_ROW >= conv_std_logic_vector(472,11))  OR (TANK_ROW >= conv_std_logic_vector(472,11)) OR (TANK_ROW >= conv_std_logic_vector(472,11))) THEN
+			 TANK_REACHED <= '1';
+	
+		ELSE
+			 TANK_REACHED <= '0';
+				
+		END IF;
+		---- ADDED ENDS
+	else
+		scoRE_INCREMENT <= '0';
+		EnaBLE_Tank <= '1';
+	end if;
+END IF;
+END IF;
+END PROCESS;
+COLLISION_DETECTED <= SCORE_INCREMENT;
+ENABLE_OUT <= enable_tank;
+END BEHAVIOUR;
+--
+--if (count_score = 1) then 
+--			count_score := 0;
+--			SCORE_INCREMENT <= '1';
+--		else
+--			SCORE_INCREMENT <= '0';
+--		END IF;
+--if (counter > 1) and (counter  < 2) then 
+--			SCORE_INCREMENT <= '1';
+--		else
+--			SCORE_INCREMENT <= '0';
+--		END IF;
